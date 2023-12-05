@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field, validator
 class Person(BaseModel):
     id: str = Field(default_factory=uuid.uuid4, alias="_id")
     name: str = Field(...)
-    surname: str = Field(...)
+    surname: Optional[str] = Field(default=None)
     maiden_name: Optional[str] = Field(default=None)
     patronymic: Optional[str] = Field(default=None)
     date_of_birth: Optional[date] = Field(default=None)
@@ -15,7 +15,9 @@ class Person(BaseModel):
     informal_role: Optional[str] = Field(default=None)
     place_of_birth: Optional[str] = Field(default=None)
     place_of_residance: Optional[str] = Field(default=None)
+    education: Optional[str] = Field(default=None)
     occupation: Optional[str] = Field(default=None)
+    contacts: Optional[str] = Field(default=None)
     notes: Optional[str] = Field(default=None)
 
     @validator('id', pre=True, always=True)

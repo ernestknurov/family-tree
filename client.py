@@ -28,7 +28,27 @@ BASE_URL = "http://127.0.0.1:8000"  # default FastAPI address, adjust if differe
 # response = requests.post(f"{BASE_URL}/person", data=person_dict, headers={"Content-Type": "application/json"})
 # print(response.status_code)
 # print(response.json())
-
+template = {
+    "id": "",
+    "name": "",
+    "surname": "",
+    "patronymic": "",
+    "date_of_birth": "",
+    "date_of_death": "",
+    "maiden_name": "",
+    "informal_role": "",
+    "place_of_birth": "",
+    "place_of_residance": "",
+    "education": "",
+    "occupation": "",
+    "contacts": {},
+    "links": {
+        "mother": "",
+        "father": "",
+        "childs": []
+    },
+    "notes": ""
+}
 new_person_dict = {
     "name": "Chilly",
     "surname": "Billy",
@@ -41,17 +61,17 @@ new_person = PersonUpdate(
     surname="Billy",
 )
 new_person_dict = new_person.model_dump_json(by_alias=True)
-# response = requests.put(f"{BASE_URL}/person/f014001a-7890-4fe0-9fbb-431d1613452b", data=new_person_dict, headers={"Content-Type": "application/json"})
+response = requests.put(f"{BASE_URL}/person/f014001a-7890-4fe0-9fbb-431d1613452b", data=new_person_dict, headers={"Content-Type": "application/json"})
+print(response.status_code)
+print(response.json())
+
+response = requests.get(f"{BASE_URL}/person/f014001a-7890-4fe0-9fbb-431d1613452b")
+print(response.status_code)
+print(response.json())
+
+# response = requests.delete(f"{BASE_URL}/person/b3d8c701-9024-432e-ba09-4fe38be0df4c")
 # print(response.status_code)
 # print(response.json())
-
-response = requests.get(f"{BASE_URL}/person/b3d8c701-9024-432e-ba09-4fe38be0df4c")
-print(response.status_code)
-print(response.json())
-
-response = requests.delete(f"{BASE_URL}/person/b3d8c701-9024-432e-ba09-4fe38be0df4c")
-print(response.status_code)
-print(response.json())
 
 # person = Person(**response.json())
 # print(person)
