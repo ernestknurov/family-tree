@@ -4,7 +4,7 @@ import shutil
 import graphviz
 import streamlit as st
 from datetime import datetime
-from functions import get_person
+from functions import get_person_from_db, get_person_full_name_from_id, get_person_id_from_full_name, get_person, delete_person
 
 
 if 'init' not in st.session_state:
@@ -21,6 +21,7 @@ if 'init' not in st.session_state:
     st.session_state['init'] = True
     with open('person.json', 'r') as f:
         st.session_state.persons = json.load(f)
+    st.session_state.full_names = [get_person_full_name_from_id(person['id'], st.session_state.persons) for person in st.session_state.persons]
 
 st.title("Family Tree")
 
@@ -43,6 +44,14 @@ with st.sidebar:
                 occupation = st.text_area("Occupation")
                 contacts = st.text_area("Contacts")
                 notes = st.text_area("Notes")
+
+                st.write("**Links**")
+                mother = st.selectbox("Mother", st.session_state.full_names, placeholder="Type full name or choose from the list", index=None)
+                father = st.selectbox("Father", st.session_state.full_names, placeholder="Type full name or choose from the list", index=None)
+                siblings = st.multiselect("Siblings", st.session_state.full_names, placeholder="Type full name or choose from the list", default=None)
+                childs = st.multiselect("Childs", st.session_state.full_names, placeholder="Type full name or choose from the list", default=None)
+                partners = st.multiselect("Partners", st.session_state.full_names, placeholder="Type full name or choose from the list", default=None)
+
                 st.session_state['submit_add_person'] = st.form_submit_button("Submit")
 
             if st.session_state['submit_add_person']:
@@ -63,9 +72,11 @@ with st.sidebar:
                             "all": contacts
                         },
                         "links": {
-                            "mother": -1,
-                            "father": -1,
-                            "childs": []
+                            "mother": get_person_id_from_full_name(mother, st.session_state.persons),
+                            "father": get_person_id_from_full_name(father, st.session_state.persons),
+                            "siblings": [get_person_id_from_full_name(sibling, st.session_state.persons) for sibling in siblings],
+                            "childs": [get_person_id_from_full_name(child, st.session_state.persons) for child in childs],
+                            "partner": [get_person_id_from_full_name(partner, st.session_state.persons) for partner in partners]
                         },
                         "notes": notes
                     }
@@ -77,53 +88,15 @@ with st.sidebar:
     with st.container(border=True):
         st.subheader("Find person")
         if st.toggle("show/hide", key=2):
-            with st.form("get_person"):
-                name = st.text_input("name")
-                surname = st.text_input("surname")
-                st.session_state['submit_get_person'] = st.form_submit_button("Submit")
-
-            if st.session_state['submit_get_person']:
-                matches = get_person(name, surname, st.session_state.persons)
-                st.write('Found people:')
-                if len(matches):
-                    for match in matches:
-                        st.write(match)
-                else:
-                    st.write("no one")
+            get_person()
 
     # DELETE PERSON
     with st.container(border=True):
         st.subheader("Delete person")
         if st.toggle("show/hide", key=3):
-            with st.form("delete_person"):
-                st.write("**Find person to delete**")
-                name = st.text_input("name")
-                surname = st.text_input("surname")
-                st.session_state['submit_find_person_to_delete'] = st.form_submit_button("Submit") 
+            delete_person()
+        # print(json.dumps(st.session_state.persons, indent=4, ensure_ascii=False))
 
-            if st.session_state['submit_find_person_to_delete'] or st.session_state['submit_delete_person']:
-                matches = get_person(name, surname, st.session_state.persons)
-                if len(matches):
-                    st.session_state['submit_delete_person'] = True
-                    # st.write(matches)
-                    st.write("Click on the person to delete it:")
-                    btns = []
-                    for match in matches:
-                        mini_description = f"Name: {match['name']}  \n"\
-                                            f"Surname: {match['surname']}  \n"\
-                                            f"Patronymic: {match['patronymic']}  \n"\
-                                            f"Date of birth: {match['date_of_birth']}"
-                        btns.append(st.button(mini_description))
-                    
-                    # print(json.dumps(st.session_state.persons, indent=4, ensure_ascii=False))
-                    if any(btns):
-                        matches_id = btns.index(True)
-                        person_id = matches[matches_id]['id']
-                        st.session_state.persons.pop(person_id)
-                        st.success(f"{matches[matches_id]['name']} was succesfully deleted!")
-                        st.session_state['submit_delete_person'] = False
-                else:
-                    st.warning("No persons were found")
 
     # MODIFY PERSON
     with st.container(border=True):
@@ -139,7 +112,7 @@ with st.sidebar:
                st.session_state['submit_choose_person_to_modify'] or\
                st.session_state['submit_modify_person_info'] or\
                st.session_state['submit_save_person_info_changes']:
-                matches = get_person(name, surname, st.session_state.persons)
+                matches = get_person_from_db(name, surname, st.session_state.persons)
                 if not len(matches):
                     st.warning("No persons were found")
 
@@ -221,7 +194,7 @@ with st.sidebar:
 
     if st.button("Sync with database"):
         # 1. Make backup
-        timestamp_format = "%Y-%d-%m-%H:%M"
+        timestamp_format = "%Y-%n-%d-%H:%M"
         timestamp = datetime.now().strftime(timestamp_format)
 
         source_path = "person.json" 

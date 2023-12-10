@@ -163,3 +163,4 @@ cython_debug/
 person*.json
 to-do.txt
 edit_persons.py
+test.py
