@@ -59,64 +59,92 @@ def get_person_full_name(person: dict) -> str:
 
 
 # DELETE
-def delete_person_from_db(person: dict, db: list) -> bool:
-
-    def delete_links(from_whom: str, whom: str, person: dict=person, db: list=db) -> bool:
-        if isinstance(person['links'][from_whom], list):
-            for relative_id in person['links'][from_whom]:
-                relative_id_in_list = [relative_id == person['id'] for person in db].index(True)
-                if isinstance(person['links'][whom], list):
-                    db[relative_id_in_list]['links'][whom].remove(person['id'])
-                elif isinstance(person['links'][whom], int):
-                    db[relative_id_in_list]['links'][whom] = None
-        elif isinstance(person['links'][from_whom], int):
-            relative_id = person['links'][from_whom]
+def delete_links(from_whom: str, whom: str, person: dict, db: list) -> bool:
+    """
+    Arguments:
+    - from_whom: relative in whom to delete links to you
+    - who: who is you to this relative
+    """
+    if isinstance(person['links'][from_whom], list):
+        for relative_id in person['links'][from_whom]:
             relative_id_in_list = [relative_id == person['id'] for person in db].index(True)
             if isinstance(person['links'][whom], list):
                 db[relative_id_in_list]['links'][whom].remove(person['id'])
             elif isinstance(person['links'][whom], int):
                 db[relative_id_in_list]['links'][whom] = None
-        return True
-    
-    delete_links('mother', 'childs')
-    delete_links('father', 'childs')
-    delete_links('childs', 'father' if person['is_male'] else 'mother')
-    delete_links('siblings', 'siblings')
-    delete_links('partners', 'partners')
+    elif isinstance(person['links'][from_whom], int):
+        relative_id = person['links'][from_whom]
+        relative_id_in_list = [relative_id == person['id'] for person in db].index(True)
+        if isinstance(person['links'][whom], list):
+            db[relative_id_in_list]['links'][whom].remove(person['id'])
+        elif isinstance(person['links'][whom], int):
+            db[relative_id_in_list]['links'][whom] = None
+    return True
+
+
+def delete_person_from_db(person: dict, db: list) -> bool:
+    delete_links('mother', 'childs', person, db)
+    delete_links('father', 'childs', person, db)
+    delete_links('childs', 'father' if person['is_male'] else 'mother', person, db)
+    delete_links('siblings', 'siblings', person, db)
+    delete_links('partners', 'partners', person, db)
     db.remove(person)
     return True
 
 
 
 # ADD
-def add_person_to_db(person: dict, db: dict) -> bool:
-
-    def add_links(from_whom: str, whom: str, person: dict=person, db: list=db) -> bool:
-        if isinstance(person['links'][from_whom], list):
-            for relative_id in person['links'][from_whom]:
-                relative_id_in_list = [relative_id == person['id'] for person in db].index(True)
-                if isinstance(person['links'][whom], list):
-                    db[relative_id_in_list]['links'][whom].append(person['id'])
-                elif isinstance(person['links'][whom], int):
-                    db[relative_id_in_list]['links'][whom] = person['id']
-        elif isinstance(person['links'][from_whom], int):
-            relative_id = person['links'][from_whom]
+def add_links(from_whom: str, whom: str, person: dict, db: list) -> bool:
+    """
+    Arguments:
+    - from_whom: relative in whom to delete links to you
+    - who: who is you to this relative
+    """
+    if isinstance(person['links'][from_whom], list):
+        for relative_id in person['links'][from_whom]:
             relative_id_in_list = [relative_id == person['id'] for person in db].index(True)
             if isinstance(person['links'][whom], list):
                 db[relative_id_in_list]['links'][whom].append(person['id'])
             elif isinstance(person['links'][whom], int):
                 db[relative_id_in_list]['links'][whom] = person['id']
-        return True
+    elif isinstance(person['links'][from_whom], int):
+        relative_id = person['links'][from_whom]
+        relative_id_in_list = [relative_id == person['id'] for person in db].index(True)
+        if isinstance(person['links'][whom], list):
+            db[relative_id_in_list]['links'][whom].append(person['id'])
+        elif isinstance(person['links'][whom], int):
+            db[relative_id_in_list]['links'][whom] = person['id']
+    return True
     
+
+def add_person_to_db(person: dict, db: dict) -> bool:
     person['id'] = max([person['id'] for person in db]) + 1
-    add_links('mother', 'childs')
-    add_links('father', 'childs')
-    add_links('childs', 'father' if person['is_male'] else 'mother')
-    add_links('siblings', 'siblings')
-    add_links('partners', 'partners')
+    add_links('mother', 'childs', person, db)
+    add_links('father', 'childs', person, db)
+    add_links('childs', 'father' if person['is_male'] else 'mother', person, db)
+    add_links('siblings', 'siblings', person, db)
+    add_links('partners', 'partners', person, db)
     db.append(person)
     return True
 
+
+# MODIFY
+def modify_person_in_db(old_person: dict, new_person: dict, db: dict) -> bool:
+
+    delete_links('mother', 'childs', old_person, db)
+    delete_links('father', 'childs', old_person, db)
+    delete_links('childs', 'father' if old_person['is_male'] else 'mother', old_person, db)
+    delete_links('siblings', 'siblings', old_person, db)
+    delete_links('partners', 'partners', old_person, db)
+
+    add_links('mother', 'childs', new_person, db)
+    add_links('father', 'childs', new_person, db)
+    add_links('childs', 'father' if new_person['is_male'] else 'mother', new_person, db)
+    add_links('siblings', 'siblings', new_person, db)
+    add_links('partners', 'partners', new_person, db)
+    person_index_in_list = [object['id'] == new_person['id'] for object in st.session_state.persons].index(True)
+    db[person_index_in_list] = new_person
+    return True
 
 
 # OTHER

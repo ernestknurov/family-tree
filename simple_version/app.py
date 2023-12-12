@@ -47,7 +47,6 @@ with st.sidebar:
             delete_person()
         # print(json.dumps(st.session_state.persons, indent=4, ensure_ascii=False))
 
-
     # MODIFY PERSON
     with st.container(border=True):
         st.subheader("Modify person's info")

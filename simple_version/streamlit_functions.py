@@ -1,7 +1,9 @@
 import streamlit as st
 from datetime import datetime
 from functions import get_person_from_db, beautify_person_info, delete_person_from_db, \
-    get_person_id_from_full_name, add_person_to_db, get_person_full_name_from_id, get_person_full_name
+    get_person_id_from_full_name, add_person_to_db, get_person_full_name_from_id, get_person_full_name \
+    , modify_person_in_db
+    
 
 def get_person() -> None:
     with st.form("get_person"):
@@ -96,9 +98,7 @@ def add_person() -> None:
                 "place_of_residance": place_of_residance,
                 "education": education,
                 "occupation": occupation,
-                "contacts": {
-                    "all": contacts
-                },
+                "contacts": contacts,
                 "links": {
                     "mother": get_person_id_from_full_name(mother, st.session_state.persons) if mother else None,
                     "father": get_person_id_from_full_name(father, st.session_state.persons) if father else None,
@@ -202,9 +202,7 @@ def modify_person() -> None:
                         "place_of_residance": place_of_residance,
                         "education": education,
                         "occupation": occupation,
-                        "contacts": {
-                            "all": contacts
-                        },
+                        "contacts": contacts,
                         "links": {
                             "mother": get_person_id_from_full_name(mother, st.session_state.persons) if mother else None,
                             "father": get_person_id_from_full_name(father, st.session_state.persons) if father else None,
@@ -214,8 +212,9 @@ def modify_person() -> None:
                         },
                         "notes": notes
                     }
-                person_index = [object['id'] == person['id'] for object in st.session_state.persons].index(True)
-                st.session_state.persons[person_index] = modified_person
+                
+                modify_person_in_db(st.session_state.person, modified_person, st.session_state.persons)
+                
                 st.session_state['submit_modify_person_info'] = False
                 st.session_state['submit_save_person_info_changes'] = False
                 st.session_state['finished_modify_person_info'] = True
