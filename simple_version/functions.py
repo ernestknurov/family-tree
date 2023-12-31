@@ -148,7 +148,7 @@ def modify_person_in_db(old_person: dict, new_person: dict, db: dict) -> bool:
 
 
 # OTHER
-def beautify_person_info(person: dict, db: list) -> dict:
+def beautify_person_info(person: dict, db: list, show_empty_info: bool=False) -> dict:
     
     locale.setlocale(locale.LC_TIME, 'ru_RU.utf8')
     beautified_person = {}
@@ -157,7 +157,7 @@ def beautify_person_info(person: dict, db: list) -> dict:
     beautified_person['ФИО'] = get_person_full_name_from_id(person['id'], db)
     if not person['is_male']:
         beautified_person['Девичья фамилия'] = person['maiden_name']
-    beautified_person['Пол'] = 'мужчина' if person['is_male'] else 'женщина'
+    beautified_person['Пол'] = 'Мужчина' if person['is_male'] else 'Женщина'
     beautified_person['Дата рождения'] = person['date_of_birth']
     beautified_person['Дата смерти'] = person['date_of_death']
     beautified_person['Неформальная роль'] = person['informal_role']
@@ -165,6 +165,15 @@ def beautify_person_info(person: dict, db: list) -> dict:
     beautified_person['Место проживания'] = person['place_of_residance']
     beautified_person['Образование'] = person['education']
     beautified_person['Занятость'] = person['occupation']
+    beautified_person['Увлечения'] = person['hobby']
+    beautified_person['Здоровье'] = person['health']
+    beautified_person['Физические данные'] = {
+        "Цвет глаз": person['physical_characteristics']['eye_color'],
+        "Цвет волос": person['physical_characteristics']['hair_color'],
+        "Рост": person['physical_characteristics']['height'],
+        "Вес": person['physical_characteristics']['weight'],
+        "Описание внешности": person['physical_characteristics']['appearance_description'],
+    }
     beautified_person['Родственники'] = {
         'Отец': get_person_full_name_from_id(person['links']['father'], db) if person['links']['father'] is not None else None,
         'Мать': get_person_full_name_from_id(person['links']['mother'], db) if person['links']['mother'] is not None else None,
@@ -184,14 +193,16 @@ def beautify_person_info(person: dict, db: list) -> dict:
     final_info = ''
     for key, value in beautified_person.items():
         if value is None:
-            final_info += f"**{key}**: \-  \n"
+            if show_empty_info:
+                final_info += f"**{key}**: \-  \n"
         elif isinstance(value, datetime):
             final_info += f"**{key}**: {value.strftime('%d %B %Y')}  \n"
         elif isinstance(value, dict):
             final_info += f'**{key}**:  \n'
             for inner_key, inner_value in value.items():
-                if inner_value is None or inner_value == []:
-                    final_info += f"* {inner_key}: \-  \n"
+                if inner_value is None or inner_value == [] or inner_value == "":
+                    if show_empty_info:
+                        final_info += f"* {inner_key}: \-  \n"
                 else:
                     final_info += f'* {inner_key}: {inner_value}  \n'
             final_info += "\n"

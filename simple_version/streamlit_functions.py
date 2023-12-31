@@ -72,8 +72,17 @@ def add_person() -> None:
         place_of_residance = st.text_input("Place of residance")
         education = st.text_area("Education")
         occupation = st.text_area("Occupation")
+        hobby = st.text_area("Hobby")
+        health = st.text_area("Health information")
         contacts = st.text_area("Contacts")
         notes = st.text_area("Notes")
+
+        st.write("**Physical characteristics**")
+        eye_color = st.text_input("Eye color")
+        hair_color = st.text_input("Hair color")
+        height = st.text_input("Height", placeholder="In cm")
+        weight = st.text_input("Weight", placeholder="In kg")
+        appearance = st.text_area("Appearance description")
 
         st.write("**Links**")
         mother = st.selectbox("Mother", st.session_state.full_names, placeholder="Type full name or choose from the list", index=None)
@@ -81,6 +90,7 @@ def add_person() -> None:
         siblings = st.multiselect("Siblings", st.session_state.full_names, placeholder="Type full name or choose from the list", default=None)
         childs = st.multiselect("Childs", st.session_state.full_names, placeholder="Type full name or choose from the list", default=None)
         partners = st.multiselect("Partners", st.session_state.full_names, placeholder="Type full name or choose from the list", default=None)
+
 
         st.session_state['submit_add_person'] = st.form_submit_button("Submit")
 
@@ -98,7 +108,16 @@ def add_person() -> None:
                 "place_of_residance": place_of_residance,
                 "education": education,
                 "occupation": occupation,
+                "hobby": hobby,
+                "health": health,
                 "contacts": contacts,
+                "physical_characteristics": {
+                    "hair_color": hair_color,
+                    "eye_color": eye_color,
+                    "height":  height,
+                    "weight": weight,
+                    "appearance_description": appearance
+                },
                 "links": {
                     "mother": get_person_id_from_full_name(mother, st.session_state.persons) if mother else None,
                     "father": get_person_id_from_full_name(father, st.session_state.persons) if father else None,
@@ -163,7 +182,19 @@ def modify_person() -> None:
                     place_of_residance = st.text_input("Place of residance", value=person['place_of_residance'])
                     education = st.text_area("Education", value=person['education'])
                     occupation = st.text_area("Occupation", value=person['occupation'])
+                    hobby = st.text_area("Hobby", value=person['hobby'])
+                    health = st.text_area("Health information", value=person['health'])
                     contacts = st.text_area("Contacts", value=person['contacts'])
+                    notes = st.text_area("Notes", value=person['notes'])
+
+                    st.write("**Physical characteristics**")
+                    eye_color = st.text_input("Eye color", value=person["physical_characteristics"]['eye_color'])
+                    hair_color = st.text_input("Hair color", value=person["physical_characteristics"]['hair_color'])
+                    height = st.text_input("Height", placeholder="In cm",
+                                            value=person["physical_characteristics"]['height'])
+                    weight = st.text_input("Weight", placeholder="In kg",
+                                            value=person["physical_characteristics"]['weight'])
+                    appearance = st.text_area("Appearance description", value=person["physical_characteristics"]['appearance_description'])
 
                     st.write("**Links**")
                     mother = st.selectbox("Mother", st.session_state.full_names, 
@@ -182,7 +213,6 @@ def modify_person() -> None:
                                               placeholder="Type full name or choose from the list", 
                                               default=[get_person_full_name_from_id(pt, st.session_state.persons) for pt in person['links']['partners']])
 
-                    notes = st.text_area("Notes", value=person['notes'])
                     st.session_state['submit_save_person_info_changes'] = st.form_submit_button("Confirm changes")
             
 
@@ -202,7 +232,16 @@ def modify_person() -> None:
                         "place_of_residance": place_of_residance,
                         "education": education,
                         "occupation": occupation,
+                        "hobby": hobby,
+                        "health": health,
                         "contacts": contacts,
+                        "physical_characteristics": {
+                            "hair_color": hair_color,
+                            "eye_color": eye_color,
+                            "height":  height,
+                            "weight": weight,
+                            "appearance_description": appearance
+                        },
                         "links": {
                             "mother": get_person_id_from_full_name(mother, st.session_state.persons) if mother else None,
                             "father": get_person_id_from_full_name(father, st.session_state.persons) if father else None,
