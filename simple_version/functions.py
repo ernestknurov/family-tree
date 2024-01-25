@@ -49,12 +49,16 @@ def get_person_id_from_full_name(full_name: str, persons: list) -> int:
 
 def get_person_full_name_from_id(id: int, db: list) -> str:
     person = get_person_from_db_by_id(id, db)
-    full_name = " ".join([person[field] for field in ['surname', 'name', 'patronymic'] if person[field]])
+    # full_name = " ".join([person[field] for field in ['surname', 'name', 'patronymic'] if person[field]])
+    full_name = get_person_full_name(person)
     return full_name
 
 
 def get_person_full_name(person: dict) -> str:
     full_name = " ".join([person[field] for field in ['surname', 'name', 'patronymic'] if person[field]])
+    # maiden_name = f"({person['maiden_name']}) " if person['is_male'] else ''
+    # patronymic = person['patronymic'] if person['patronymic'] else ''
+    # full_name = f"{person['surname']} {maiden_name}{person['surname']} {patronymic}"
     return full_name
 
 
