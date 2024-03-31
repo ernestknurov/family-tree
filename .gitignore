@@ -166,3 +166,5 @@ edit_persons.py
 test.py
 .vscode
 *.todo
+.streamlit
+.DS_store

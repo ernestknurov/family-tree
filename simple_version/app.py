@@ -7,6 +7,7 @@ from datetime import datetime
 from streamlit_functions import get_person, delete_person, add_person, modify_person
 from functions import get_person_full_name_from_id
 
+PATH_TO_DATABASE = st.secrets['path_to_database']
 
 if 'init' not in st.session_state:
     st.session_state['submit_add_person'] = False
@@ -20,7 +21,7 @@ if 'init' not in st.session_state:
     st.session_state['finished_modify_person_info'] = False
     st.session_state['person'] = {}
     st.session_state['init'] = True
-    with open('person.json', 'r') as f:
+    with open(PATH_TO_DATABASE, 'r') as f:
         st.session_state.persons = json.load(f)
     st.session_state.full_names = [get_person_full_name_from_id(person['id'], st.session_state.persons) for person in st.session_state.persons]
     st.session_state.id_to_list_index = {person['id']:index for index, person in enumerate(st.session_state.persons)}
@@ -45,7 +46,6 @@ with st.sidebar:
         st.subheader("Delete person")
         if st.toggle("show/hide", key=3):
             delete_person()
-        # print(json.dumps(st.session_state.persons, indent=4, ensure_ascii=False))
 
     # MODIFY PERSON
     with st.container(border=True):
@@ -70,9 +70,6 @@ with st.sidebar:
         st.success("Successfully synchronized!")
         time.sleep(2)
         st.rerun()
-
-    
-
 
 
 graph = graphviz.Digraph()

@@ -33,10 +33,10 @@ class Person(BaseModel):
         json_schema_extra = {
             "example": {
                 "_id": "066de609-b04a-4b30-b46c-32537c7f1f6e",
-                "name": "Эрнест",
-                "surname": "Кнуров",
+                "name": "Владимир",
+                "surname": "Владимов",
                 "patronymic": "Владимирович",
-                "date_of_birth": date(2002, 9, 11),
+                "date_of_birth": date(2023, 1, 1),
                 "date_of_death": None
             }
         }
@@ -53,8 +53,8 @@ class PersonUpdate(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "name": "Иосиф",
-                "surname": "Янушевский",
+                "name": "Иван",
+                "surname": "Иванов",
                 "patronymic": None,
                 "date_of_birth": None,
                 "date_of_death": date(2021, 1, 1)
