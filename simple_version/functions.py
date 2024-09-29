@@ -1,6 +1,6 @@
-import locale
 import streamlit as st
 from datetime import datetime
+from babel.dates import format_date
 
 
 # GET
@@ -154,7 +154,6 @@ def modify_person_in_db(old_person: dict, new_person: dict, db: dict) -> bool:
 # OTHER
 def beautify_person_info(person: dict, db: list, show_empty_info: bool=False) -> dict:
     
-    locale.setlocale(locale.LC_TIME, 'ru_RU.utf8')
     beautified_person = {}
     
     # map fields to readble russian
@@ -190,9 +189,11 @@ def beautify_person_info(person: dict, db: list, show_empty_info: bool=False) ->
 
 
     if beautified_person['Дата рождения']:
-        beautified_person['Дата рождения'] = datetime.strptime(beautified_person['Дата рождения'], '%Y-%m-%d')
+        beautified_person['Дата рождения'] = format_date(datetime.strptime(beautified_person['Дата рождения'], '%Y-%m-%d'),
+                                                         format = 'long', locale='ru_RU')
     if beautified_person['Дата смерти']:
-        beautified_person['Дата смерти'] = datetime.strptime(beautified_person['Дата смерти'], '%Y-%m-%d')
+        beautified_person['Дата смерти'] = format_date(datetime.strptime(beautified_person['Дата смерти'], '%Y-%m-%d'),
+                                                       format = 'long', locale='ru_RU')
 
     final_info = ''
     for key, value in beautified_person.items():
