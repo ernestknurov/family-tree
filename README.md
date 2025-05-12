@@ -30,6 +30,20 @@ Before starting the application, you need to create a `person.json` file which w
 path_to_database = "<path_to_your_file>"
 ```
 
+#### Notion Integration (Optional)
+
+To sync your family tree with a Notion database:
+
+1. Create a Notion integration at https://www.notion.so/my-integrations
+2. Create a database in Notion with the appropriate properties to store person data
+3. Share your database with the integration you created
+4. Add your Notion API key and database ID to `.streamlit/secrets.toml`:
+
+```toml
+notion_api_key = "your-notion-api-key"
+notion_database_id = "your-notion-database-id"
+```
+
 ### Installation
 
 Clone the project and install the required libraries:
@@ -46,5 +60,13 @@ poetry install
 Run the application using the following command:
 
 ```bash
-poetry run streamlit run simple_version/app.py
+poetry run streamlit run app.py
 ```
+
+### Features
+
+- Create, edit, and delete person records in your family tree
+- Search for people by name and surname
+- Visualize family connections through a graph
+- Backup your data automatically when making changes
+- Sync your family tree with a Notion database (new!)

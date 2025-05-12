@@ -13,6 +13,7 @@ requests = "^2.31.0"
 streamlit = "^1.29.0"
 graphviz = "^0.20.1"
 babel = "^2.16.0"
+notion-client = "^2.0.0"
 
 
 [build-system]

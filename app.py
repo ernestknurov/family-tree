@@ -6,6 +6,7 @@ import streamlit as st
 from datetime import datetime
 from streamlit_functions import get_person, delete_person, add_person, modify_person
 from functions import get_person_full_name_from_id
+import os
 
 st.set_page_config(layout="wide")
 PATH_TO_DATABASE = st.secrets['path_to_database']
@@ -54,24 +55,49 @@ with st.sidebar:
         if st.toggle("show/hide", key=4):
             modify_person()
 
-
-    if st.button("Sync with database"):
-        # 1. Make backup
-        timestamp_format = "%Y-%n-%d-%H:%M"
-        timestamp = datetime.now().strftime(timestamp_format)
-
-        source_path = "person.json" 
-        destination_path = f"backups/person_backup({timestamp}).json"
-        shutil.move(source_path, destination_path)
-
-        # 2. Save new version of persons.json
-        with open("person.json", "w") as f:
-            json.dump(st.session_state.persons, f, indent=4, ensure_ascii=False)
+    # SYNC OPTIONS
+    with st.container(border=True):
+        st.subheader("Sync Options")
         
-        st.success("Successfully synchronized!")
-        time.sleep(2)
-        st.rerun()
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("Sync with database"):
+                # 1. Make backup
+                timestamp_format = "%Y-%m-%d-%H:%M"
+                timestamp = datetime.now().strftime(timestamp_format)
+                
+                # Create backups directory if it doesn't exist
+                if not os.path.exists("backups"):
+                    os.makedirs("backups")
 
+                source_path = "person.json" 
+                destination_path = f"backups/person_backup({timestamp}).json"
+                shutil.copy(source_path, destination_path)  # Use copy instead of move
+
+                # 2. Save new version of persons.json
+                with open("person.json", "w") as f:
+                    json.dump(st.session_state.persons, f, indent=4, ensure_ascii=False)
+                
+                st.success("Successfully synchronized with local database!")
+                time.sleep(2)
+                st.rerun()
+        
+        with col2:
+            if st.button("Sync with Notion"):
+                from notion_sync import sync_to_notion
+                
+                # First sync local database
+                with open("person.json", "w") as f:
+                    json.dump(st.session_state.persons, f, indent=4, ensure_ascii=False)
+                
+                # Then sync to Notion
+                if sync_to_notion(st.session_state.persons):
+                    st.success("Successfully synchronized with Notion!")
+                else:
+                    st.error("Failed to sync with Notion. Check your API key and database ID.")
+                time.sleep(2)
+                st.rerun()
 
 graph = graphviz.Digraph()
 
