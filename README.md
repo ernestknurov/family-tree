@@ -5,7 +5,7 @@ An intuitive UI tool for creating, editing, storing, and visualizing family tree
 
 ## Overview
 
-Family Tree provides a clear user interface that allows users to store, edit, and locate their relatives within a database. It visualizes family connections through a graph tree, making it easier to understand familial relationships. The project is an ongoing development effort, with the currently working version located in the `simple_version` directory.
+Family Tree provides a clear user interface that allows users to store, edit, and locate their relatives within a database. It visualizes family connections through a graph tree, making it easier to understand familial relationships.
 
 ## Getting Started
 
